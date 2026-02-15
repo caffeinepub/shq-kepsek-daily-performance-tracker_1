@@ -1,0 +1,230 @@
+{
+  "kind": "build_request",
+  "title": "SHQ Kepsek Daily Performance Tracker: Role-based daily submissions, scoring, and director analytics dashboards",
+  "priority": "normal",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "text": "Implement secure authentication using Internet Identity and role-based access control for two roles: Director/Management (Super Admin) and Kepsek (Principal). Users must sign in with Internet Identity and be authorized to access only the pages for their role.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "Secure login for each role."
+        ]
+      },
+      "acceptanceCriteria": [
+        "Unauthenticated users are prompted to sign in with Internet Identity before accessing any app pages.",
+        "After login, users are routed to the correct dashboard based on their assigned role (Director vs Kepsek).",
+        "Role-protected routes/pages cannot be accessed by direct URL navigation from an unauthorized role.",
+        "Session state in the UI correctly reflects logged-in/logged-out status."
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "text": "Add a Director/Management (Super Admin) admin flow to assign and manage Kepsek user profiles, including: principal display name, school name, and region (Wilayah). Role assignment must be controlled by Director/Management (no self-selection by Kepsek).",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "The app has two main roles: Director/Management (Super Admin) and Kepsek (Principal).",
+          "Profile Header: Display School Name, Region (Wilayah), and Principal's Name."
+        ]
+      },
+      "acceptanceCriteria": [
+        "A Director can create/update a Kepsek profile linked to a logged-in Internet Identity principal.",
+        "Each Kepsek profile includes: Principal Name, School Name, Region (Wilayah).",
+        "A Kepsek user can view (but not edit) their own profile fields shown in the profile header.",
+        "Non-Director users cannot access profile management endpoints or UI."
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Implement the daily submission data model and scoring logic where each daily form submission has a maximum of 100 points, computed as 5 categories worth 20 points each: Attendance (photo + time in/out), Class Control, Teacher Control, Parent Response, and Program Execution & Problem Solving. Any category left blank/unchecked scores 0 points for that category (no 'N/A' behavior).",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "Each daily form submission by a Kepsek is worth a maximum of 100 points, calculated as follows:",
+          "Attendance (Photo Upload + Time In/Out): 20 points.",
+          "Class Control (Kontrol Kelas): 20 points.",
+          "Teacher Control (Kontrol Guru): 20 points.",
+          "Parent Response (Respon Wali Santri): 20 points.",
+          "Program Execution & Problem Solving: 20 points."
+        ]
+      },
+      "acceptanceCriteria": [
+        "Backend stores a daily submission per Kepsek per calendar day (reject or update deterministically if resubmitted for the same day).",
+        "Score breakdown per category is stored or reproducible from stored fields, and total score equals the sum (0–100).",
+        "Attendance category scores 20 only when both time in/out and an attendance photo are present; otherwise 0.",
+        "Other categories score 20 when the corresponding checklist/notes field indicates completion; otherwise 0.",
+        "Backend exposes query methods to retrieve submissions and computed scores for dashboards."
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "text": "Build the Kepsek dashboard (input side) with: (1) profile header showing School Name, Region (Wilayah), and Principal Name; (2) daily form with time pickers for arrival and departure, attendance photo upload, checklists/notes for Class Control / Teacher Control / Parent Interaction / Running Programs, and a text area for the day’s Problem Solving; and (3) a submission history list of previous daily submissions.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "Kepsek Dashboard (Input Side):",
+          "Profile Header: Display School Name, Region (Wilayah), and Principal's Name.",
+          "Daily Form Features: * Time picker for Arrival and Departure. Image upload for attendance proof. Checklists/Notes for: Class Control, Teacher Control, Parent Interaction, and Running Programs. Text area for \"Problem Solving\" of the day.",
+          "History of previous submissions."
+        ]
+      },
+      "acceptanceCriteria": [
+        "Kepsek dashboard renders a profile header populated from backend profile data.",
+        "Daily form allows selecting arrival and departure times and uploading one attendance photo.",
+        "Daily form includes fields for: Class Control, Teacher Control, Parent Interaction, Running Programs, and Problem Solving text.",
+        "Submitting the form calls the backend to persist the daily submission and returns the computed score to the UI.",
+        "History view lists prior submissions with date and total score, and allows viewing the saved details for a selected day.",
+        "UI is responsive and usable on mobile for time selection and photo upload."
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "text": "Implement attendance photo storage and retrieval for daily submissions with clear size limits suitable for canister storage. The Kepsek must be able to upload an image, and the Director must be able to view the uploaded image in the detail view.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "Attendance (Photo Upload + Time In/Out): 20 points.",
+          "Image upload for attendance proof.",
+          "Detail View: Ability to click on a principal's name to see their specific daily uploads and problem-solving notes."
+        ]
+      },
+      "acceptanceCriteria": [
+        "Frontend restricts uploads to common image types and enforces a maximum file size (define and display the limit in UI).",
+        "Backend stores the uploaded image bytes associated with the submission and can return them for rendering.",
+        "Kepsek can see the uploaded attendance image for their submitted day (after submit and in history detail).",
+        "Director can view the uploaded attendance image for any submission in the principal detail view.",
+        "If an image exceeds limits or is invalid, the UI shows an actionable error and submission is not accepted."
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "text": "Build the Director/Management dashboard (monitoring side) with: top stats cards (Total Active Schools, Number of Principals who submitted today, Average Performance Score), a leaderboard table ranking principals by total/average daily scores, and a principal detail view accessible by clicking a principal name to view their daily uploads and problem-solving notes.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "Director/Management Dashboard (Monitoring Side):",
+          "Top Stats Cards: Total Active Schools, Number of Principals who submitted the form today, Average Performance Score.",
+          "Leaderboard Table: Ranking of Principals based on their total/average daily scores.",
+          "Detail View: Ability to click on a principal's name to see their specific daily uploads and problem-solving notes."
+        ]
+      },
+      "acceptanceCriteria": [
+        "Director dashboard displays the three stat cards computed from backend data.",
+        "Leaderboard lists principals with sortable or clearly ordered ranking by an explicitly labeled metric (total score and/or average daily score).",
+        "Clicking a principal opens a detail page/panel that lists daily submissions with date, score, and includes viewing attendance image and problem-solving text for each day.",
+        "Non-Director users cannot access these dashboard pages or backend endpoints."
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "text": "Add performance analytics for Director/Management: a line chart showing daily performance trends over time and pie/donut charts showing completion percentages for Class Control, Teacher Control, and School Programs (Running Programs).",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "Performance Analytics: * Line Chart: Daily performance trends.",
+          "Pie/Donut Charts: Percentage of completion for Class Control, Teacher Control, and School Programs."
+        ]
+      },
+      "acceptanceCriteria": [
+        "Director can select a time range (at minimum: last 7/30 days) and see a line chart of daily average score (or clearly labeled metric).",
+        "Donut/pie charts show completion rate (completed vs not completed) for Class Control, Teacher Control, and Running Programs over the selected time range (or clearly documented default range).",
+        "Chart data is derived from stored submissions and matches backend-calculated aggregates.",
+        "Charts render responsively and remain readable on smaller screens."
+      ]
+    },
+    {
+      "id": "REQ-8",
+      "text": "Provide a clean, professional, responsive dashboard UI with sidebar navigation, consistent layout across Kepsek and Director experiences, and English user-facing text throughout the app UI (labels, buttons, headings, error messages).",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "Clean, professional dashboard UI with a sidebar for navigation.",
+          "Responsive design (mobile-friendly for Principals to upload photos).",
+          "Use English for any user-facing text in the build request."
+        ]
+      },
+      "acceptanceCriteria": [
+        "App uses a consistent dashboard shell with a sidebar for navigation and a main content area.",
+        "Kepsek flows are mobile-friendly (no horizontal overflow; form controls are touch-friendly).",
+        "All visible UI strings are in English (including form labels and validation messages)."
+      ]
+    },
+    {
+      "id": "REQ-9",
+      "text": "Choose and apply a coherent visual theme (colors, typography, spacing, and component styling) appropriate for a professional school performance dashboard, and enforce it consistently across all pages (avoid blue/purple as primary brand colors).",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "Clean, professional dashboard UI with a sidebar for navigation."
+        ]
+      },
+      "acceptanceCriteria": [
+        "Theme specifies a primary/secondary palette, typography choices, and surface/background styling and is applied across dashboards and forms.",
+        "Primary brand colors are not blue/purple.",
+        "Components (cards, tables, forms, charts) share consistent styling and spacing."
+      ]
+    }
+  ],
+  "constraints": [
+    "Backend must remain a single Motoko actor (all logic in backend/main.mo).",
+    "Do not modify any frontend files under immutable paths: frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, and frontend/src/components/ui; compose and use them as-is.",
+    "Do not introduce external databases or third-party auth providers; Internet Identity only.",
+    "Store and serve attendance images without routing through external services."
+  ],
+  "nonGoals": [
+    "Payroll, HR evaluation workflows, or non-daily performance modules beyond the described daily submission and dashboards.",
+    "Real-time chat/notifications, push notifications, SMS, email integrations.",
+    "Integrations with third-party school information systems or external file storage/CDNs."
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  },
+  "userProfileUpdate": {
+    "goalsToAdd": [
+      "Build a role-based daily performance tracking app for school principals with Kepsek data entry and Director monitoring analytics."
+    ],
+    "goalsToRemove": [],
+    "preferencesToAdd": [
+      "Professional dashboard UI with sidebar navigation; mobile-friendly submission experience; English UI text."
+    ],
+    "preferencesToRemove": [],
+    "miscToAdd": [
+      "Daily scoring: 5 categories x 20 points (max 100)."
+    ],
+    "miscToRemove": [],
+    "fieldsToSet": {
+      "projectName": "SHQ Kepsek Daily Performance Tracker"
+    },
+    "fieldsToDelete": []
+  }
+}

@@ -1,0 +1,190 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-implement-secure-authentication-using-internet-identity-and-role-based-access-control-for-two-roles-director-management-super-admin-and-kepsek-principal-users-must-sign-in-with-internet-identity-and-be-authorized-to-access-only-the-pages-for-their-role",
+      "featureTitle": "Implement secure authentication using Internet Identity and role-based access control for two roles: Director/Management (Super Admin) and Kepsek (Principal). Users must sign in with Internet Identity and be authorized to access only the pages for their role.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/components/auth/AccessDenied.tsx",
+        "frontend/src/components/auth/LoginGate.tsx",
+        "frontend/src/hooks/useAuthRole.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-a-director-management-super-admin-admin-flow-to-assign-and-manage-kepsek-user-profiles-including-principal-display-name-school-name-and-region-wilayah-role-assignment-must-be-controlled-by-director-management-no-self-selection-by-kepsek",
+      "featureTitle": "Add a Director/Management (Super Admin) admin flow to assign and manage Kepsek user profiles, including: principal display name, school name, and region (Wilayah). Role assignment must be controlled by Director/Management (no self-selection by Kepsek).",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/components/profile/ProfileHeader.tsx",
+        "frontend/src/constants/regions.ts",
+        "frontend/src/pages/director/PrincipalManagementPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-build-the-kepsek-dashboard-input-side-with-1-profile-header-showing-school-name-region-wilayah-and-principal-name-2-daily-form-with-time-pickers-for-arrival-and-departure-attendance-photo-upload-checklists-notes-for-class-control-teacher-control-parent-interaction-running-programs-and-a-text-area-for-the-day-s-problem-solving-and-3-a-submission-history-list-of-previous-daily-submissions",
+      "featureTitle": "Build the Kepsek dashboard (input side) with: (1) profile header showing School Name, Region (Wilayah), and Principal Name; (2) daily form with time pickers for arrival and departure, attendance photo upload, checklists/notes for Class Control / Teacher Control / Parent Interaction / Running Programs, and a text area for the day’s Problem Solving; and (3) a submission history list of previous daily submissions.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/components/submissions/DailySubmissionForm.tsx",
+        "frontend/src/components/submissions/SubmissionDetailPanel.tsx",
+        "frontend/src/components/submissions/SubmissionHistory.tsx",
+        "frontend/src/pages/kepsek/KepsekDashboardPage.tsx",
+        "frontend/src/utils/time.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-4"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-implement-attendance-photo-storage-and-retrieval-for-daily-submissions-with-clear-size-limits-suitable-for-canister-storage-the-kepsek-must-be-able-to-upload-an-image-and-the-director-must-be-able-to-view-the-uploaded-image-in-the-detail-view",
+      "featureTitle": "Implement attendance photo storage and retrieval for daily submissions with clear size limits suitable for canister storage. The Kepsek must be able to upload an image, and the Director must be able to view the uploaded image in the detail view.",
+      "files": [
+        "frontend/src/components/submissions/DailySubmissionForm.tsx",
+        "frontend/src/components/submissions/SubmissionDetailPanel.tsx",
+        "frontend/src/components/uploads/AttendancePhotoUploader.tsx",
+        "frontend/src/constants/uploads.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-5"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-build-the-director-management-dashboard-monitoring-side-with-top-stats-cards-total-active-schools-number-of-principals-who-submitted-today-average-performance-score-a-leaderboard-table-ranking-principals-by-total-average-daily-scores-and-a-principal-detail-view-accessible-by-clicking-a-principal-name-to-view-their-daily-uploads-and-problem-solving-notes",
+      "featureTitle": "Build the Director/Management dashboard (monitoring side) with: top stats cards (Total Active Schools, Number of Principals who submitted today, Average Performance Score), a leaderboard table ranking principals by total/average daily scores, and a principal detail view accessible by clicking a principal name to view their daily uploads and problem-solving notes.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/components/director/LeaderboardTable.tsx",
+        "frontend/src/components/director/StatsCards.tsx",
+        "frontend/src/pages/director/DirectorDashboardPage.tsx",
+        "frontend/src/pages/director/PrincipalDetailPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-6"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-performance-analytics-for-director-management-a-line-chart-showing-daily-performance-trends-over-time-and-pie-donut-charts-showing-completion-percentages-for-class-control-teacher-control-and-school-programs-running-programs",
+      "featureTitle": "Add performance analytics for Director/Management: a line chart showing daily performance trends over time and pie/donut charts showing completion percentages for Class Control, Teacher Control, and School Programs (Running Programs).",
+      "files": [
+        "frontend/src/components/analytics/CompletionDonutCharts.tsx",
+        "frontend/src/components/analytics/PerformanceLineChart.tsx",
+        "frontend/src/components/analytics/TimeRangeSelector.tsx",
+        "frontend/src/pages/director/DirectorDashboardPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-7"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-provide-a-clean-professional-responsive-dashboard-ui-with-sidebar-navigation-consistent-layout-across-kepsek-and-director-experiences-and-english-user-facing-text-throughout-the-app-ui-labels-buttons-headings-error-messages",
+      "featureTitle": "Provide a clean, professional, responsive dashboard UI with sidebar navigation, consistent layout across Kepsek and Director experiences, and English user-facing text throughout the app UI (labels, buttons, headings, error messages).",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/components/layout/DashboardShell.tsx",
+        "frontend/src/components/layout/SidebarNav.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-8"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-choose-and-apply-a-coherent-visual-theme-colors-typography-spacing-and-component-styling-appropriate-for-a-professional-school-performance-dashboard-and-enforce-it-consistently-across-all-pages-avoid-blue-purple-as-primary-brand-colors",
+      "featureTitle": "Choose and apply a coherent visual theme (colors, typography, spacing, and component styling) appropriate for a professional school performance dashboard, and enforce it consistently across all pages (avoid blue/purple as primary brand colors).",
+      "files": [
+        "frontend/src/components/layout/DashboardShell.tsx",
+        "frontend/src/index.css",
+        "frontend/tailwind.config.js"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-9"
+      ],
+      "confidence": "high"
+    }
+  ]
+}

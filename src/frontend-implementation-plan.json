@@ -1,0 +1,298 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "SHQ Kepsek Daily Performance Tracker (Frontend)",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "summary": "Internet Identity sign-in gating and role-based route protection (Director vs Kepsek) with correct post-login routing and session UI state.",
+      "acceptanceCriteria": [
+        "Unauthenticated users are prompted to sign in with Internet Identity before accessing any app pages.",
+        "After login, users are routed to the correct dashboard based on their assigned role (Director vs Kepsek).",
+        "Role-protected routes/pages cannot be accessed by direct URL navigation from an unauthorized role.",
+        "Session state in the UI correctly reflects logged-in/logged-out status."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "create",
+          "description": "Create the app shell and routing composition: enforce an unauthenticated login gate using the existing Internet Identity hooks; fetch the caller role via backend calls and route to the correct dashboard (Director vs Kepsek); wire role-protected routes that show an Access Denied screen on unauthorized access. Use the selected 'authorization' component patterns for role-based access control in the UI. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/auth/LoginGate.tsx",
+          "operation": "create",
+          "description": "Add a login gate component that blocks app content until authenticated, provides Login/Logout actions via the existing immutable Internet Identity hook, and clears cached app queries on logout. Use the selected 'authorization' component guidance for login UX and cache clearing. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/auth/RoleGuard.tsx",
+          "operation": "create",
+          "description": "Add a reusable role guard wrapper that checks the caller role (Director/admin vs Kepsek/user) and prevents unauthorized role access even via direct navigation (renders an AccessDenied screen). Use the selected 'authorization' component to support role-based gating. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/hooks/useAuthRole.ts",
+          "operation": "create",
+          "description": "Create a React Query-based hook that derives auth state from the immutable identity/actor hooks and queries the backend for the caller role/admin status, exposing loading/ready states for routing decisions. Use the selected 'authorization' component guidance to avoid UI flicker during role/profile checks. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/auth/AccessDenied.tsx",
+          "operation": "create",
+          "description": "Create an English Access Denied screen component used by protected routes, with a clear action to navigate back to the appropriate dashboard or logout."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Director-only UI to assign/manage Kepsek profiles (principal name, school name, region) and Kepsek read-only profile display in their header.",
+      "acceptanceCriteria": [
+        "A Director can create/update a Kepsek profile linked to a logged-in Internet Identity principal.",
+        "Each Kepsek profile includes: Principal Name, School Name, Region (Wilayah).",
+        "A Kepsek user can view (but not edit) their own profile fields shown in the profile header.",
+        "Non-Director users cannot access profile management endpoints or UI."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/director/PrincipalManagementPage.tsx",
+          "operation": "create",
+          "description": "Create a Director-only page for managing Kepsek profiles: form inputs for Kepsek principal id, display name, school name, and region; calls backend capabilities to assign/update Kepsek profile and (if required by the flow) create/update the linked school record; show success/error states in English. Wire this page behind the RoleGuard (Director/admin only). Use shadcn-ui components for forms, inputs, dialogs, and toasts (compose existing components under frontend/src/components/ui without modifying them). Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/profile/ProfileHeader.tsx",
+          "operation": "create",
+          "description": "Create a reusable profile header component that displays School Name, Region (Wilayah), and Principal Name from backend profile data; supports read-only display for Kepsek and can be reused on Director detail views. Use shadcn-ui Card/Badge/Typography primitives (compose only). Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/hooks/useProfiles.ts",
+          "operation": "create",
+          "description": "Add hooks to fetch the caller profile (for Kepsek header) and fetch other users’ profiles (for Director views) using React Query; handle authorization traps gracefully with user-friendly English errors. Use the selected 'authorization' component guidance for profile fetching and avoiding modal flash patterns. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/constants/regions.ts",
+          "operation": "create",
+          "description": "Add a small, explicit Region list used by the UI to populate a Region (Wilayah) selector and to build the Region object required by backend calls."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Wire the Director-only Principal Management page into the router and sidebar navigation; ensure it is inaccessible to non-Director roles via RoleGuard."
+        }
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "summary": "Kepsek dashboard: profile header, daily submission form (times, attendance photo, checklists/notes, problem solving), and submission history with detail viewing.",
+      "acceptanceCriteria": [
+        "Kepsek dashboard renders a profile header populated from backend profile data.",
+        "Daily form allows selecting arrival and departure times and uploading one attendance photo.",
+        "Daily form includes fields for: Class Control, Teacher Control, Parent Interaction, Running Programs, and Problem Solving text.",
+        "Submitting the form calls the backend to persist the daily submission and returns the computed score to the UI.",
+        "History view lists prior submissions with date and total score, and allows viewing the saved details for a selected day.",
+        "UI is responsive and usable on mobile for time selection and photo upload."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/kepsek/KepsekDashboardPage.tsx",
+          "operation": "create",
+          "description": "Create the Kepsek dashboard page composed of ProfileHeader, the daily submission form, and a history list panel. Fetch caller profile and submissions via hooks; determine the caller’s school (e.g., by matching principal id against active schools) and use that school id when creating submissions. Use shadcn-ui layout primitives (cards, tabs/accordions, buttons) for a clean responsive dashboard. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/submissions/DailySubmissionForm.tsx",
+          "operation": "create",
+          "description": "Create the daily form UI: arrival/departure time pickers, attendance photo uploader, boolean fields for Class Control/Teacher Control/Parent Response/Running Programs, and a Problem Solving text area; on submit call the backend create-submission capability and show returned computed score (and per-day success feedback) in English. Use shadcn-ui form components and validation messaging (compose only). Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/submissions/SubmissionHistory.tsx",
+          "operation": "create",
+          "description": "Create a Kepsek history list component that displays previous submissions with date and total score, and allows selecting a day to view saved details. Use shadcn-ui Table/List patterns (compose only). Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/submissions/SubmissionDetailPanel.tsx",
+          "operation": "create",
+          "description": "Create a detail view/panel for a selected submission showing all saved fields including attendance times, checklists, problem solving text, total score, and the attendance image (when present). Use shadcn-ui dialog/drawer for mobile-friendly detail viewing. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/hooks/useSubmissions.ts",
+          "operation": "create",
+          "description": "Add hooks for fetching the current Kepsek submissions list and creating a submission; ensure optimistic UI is not required, but refresh history on success and handle authorization/data errors with clear English messages."
+        },
+        {
+          "path": "frontend/src/utils/time.ts",
+          "operation": "create",
+          "description": "Add time/date conversion helpers for the UI (parsing HTML time inputs, formatting times/dates for display, converting to/from the backend Time bigint representation consistently)."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Wire the Kepsek dashboard route and ensure it is protected for Kepsek/user role only via RoleGuard; ensure post-login routing sends Kepsek users here."
+        }
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "summary": "Attendance photo upload validation (type/size), upload, and rendering for Kepsek history detail and Director submission detail views.",
+      "acceptanceCriteria": [
+        "Frontend restricts uploads to common image types and enforces a maximum file size (define and display the limit in UI).",
+        "Kepsek can see the uploaded attendance image for their submitted day (after submit and in history detail).",
+        "Director can view the uploaded attendance image for any submission in the principal detail view.",
+        "If an image exceeds limits or is invalid, the UI shows an actionable error and submission is not accepted."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/uploads/AttendancePhotoUploader.tsx",
+          "operation": "create",
+          "description": "Implement an attendance photo uploader component with client-side validation (allowed image MIME types, explicit maximum size displayed in English, and actionable validation errors). Convert accepted files into the blob representation expected by the backend using the selected 'blob-storage' component (ExternalBlob) and optionally show upload progress. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/submissions/DailySubmissionForm.tsx",
+          "operation": "modify",
+          "description": "Integrate AttendancePhotoUploader into the daily form and ensure invalid images block submission; include the validated attendance photo and times in the Attendance payload when present. Use the selected 'blob-storage' component for ExternalBlob creation and image handling. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/submissions/SubmissionDetailPanel.tsx",
+          "operation": "modify",
+          "description": "Render the stored attendance image in the submission detail view using the selected 'blob-storage' component’s ExternalBlob direct URL where appropriate (and fall back safely if not available). Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/constants/uploads.ts",
+          "operation": "create",
+          "description": "Define shared UI constants for upload limits (max bytes) and allowed MIME types; ensure the limit is displayed consistently anywhere uploads occur."
+        }
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "summary": "Director dashboard: stat cards, leaderboard ranking, and principal detail view with daily submissions including attendance image and problem-solving notes.",
+      "acceptanceCriteria": [
+        "Director dashboard displays the three stat cards computed from backend data.",
+        "Leaderboard lists principals with sortable or clearly ordered ranking by an explicitly labeled metric (total score and/or average daily score).",
+        "Clicking a principal opens a detail page/panel that lists daily submissions with date, score, and includes viewing attendance image and problem-solving text for each day.",
+        "Non-Director users cannot access these dashboard pages or backend endpoints."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/director/DirectorDashboardPage.tsx",
+          "operation": "create",
+          "description": "Create the Director dashboard page with three top stat cards, a leaderboard table, and navigation to principal detail views. Fetch stats and top schools from backend capabilities; present ranking with a clearly labeled metric. Use shadcn-ui Cards and Tables (compose only). Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/pages/director/PrincipalDetailPage.tsx",
+          "operation": "create",
+          "description": "Create a Director-only principal detail page/panel accessible from leaderboard clicks; fetch the school details and submissions list; render per-day detail including attendance image and problem-solving notes. Use the selected 'blob-storage' component to display attendance images from ExternalBlob. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/director/StatsCards.tsx",
+          "operation": "create",
+          "description": "Create a stats cards component for Total Active Schools, Submissions Today, and Average Performance Score using backend-provided values, formatted for readability. Use shadcn-ui Card components (compose only). Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/director/LeaderboardTable.tsx",
+          "operation": "create",
+          "description": "Create a leaderboard table component listing principals/schools with ranking order and an explicit ranking metric label; clicking a row navigates to the principal detail view. Use shadcn-ui Table components (compose only). Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/hooks/useDirectorDashboard.ts",
+          "operation": "create",
+          "description": "Add hooks for Director stats, top schools/leaderboard data, and principal detail data retrieval; handle authorization failures with an AccessDenied experience."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Wire Director dashboard and principal detail routes into the router and sidebar navigation; protect all Director pages via RoleGuard (admin only), and ensure post-login routing sends Directors here."
+        }
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "summary": "Director analytics charts: line chart for daily performance trend and donut/pie charts for completion rates of selected categories over a time range.",
+      "acceptanceCriteria": [
+        "Director can select a time range (at minimum: last 7/30 days) and see a line chart of daily average score (or clearly labeled metric).",
+        "Donut/pie charts show completion rate (completed vs not completed) for Class Control, Teacher Control, and Running Programs over the selected time range (or clearly documented default range).",
+        "Chart data is derived from stored submissions and matches backend-calculated aggregates.",
+        "Charts render responsively and remain readable on smaller screens."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/analytics/TimeRangeSelector.tsx",
+          "operation": "create",
+          "description": "Create a simple time range selector (at least last 7 and last 30 days) used by Director analytics, with clear English labels and responsive layout. Use shadcn-ui Select/Segmented controls if available (compose only). Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/analytics/PerformanceLineChart.tsx",
+          "operation": "create",
+          "description": "Implement a responsive line chart component (rendered without introducing new top-level routes) that plots the chosen daily score metric over the selected time range; includes axis/legend labels in English and mobile-friendly sizing."
+        },
+        {
+          "path": "frontend/src/components/analytics/CompletionDonutCharts.tsx",
+          "operation": "create",
+          "description": "Implement donut/pie chart components for completion rates of Class Control, Teacher Control, and Running Programs; ensure readability on small screens and clear labeling (completed vs not completed) in English."
+        },
+        {
+          "path": "frontend/src/hooks/useAnalytics.ts",
+          "operation": "create",
+          "description": "Add a hook that derives analytics series/aggregates from stored submissions fetched via existing backend capabilities (e.g., all submissions or per-school submissions), filtered to the selected time range; ensure calculations align with backend-provided submission fields/scores."
+        },
+        {
+          "path": "frontend/src/pages/director/DirectorDashboardPage.tsx",
+          "operation": "modify",
+          "description": "Integrate the analytics section (time range selector, line chart, donut charts) into the existing Director dashboard page without adding new top-level routes; ensure the section is Director-only and responsive."
+        }
+      ]
+    },
+    {
+      "id": "REQ-8",
+      "summary": "Professional responsive dashboard UI with sidebar navigation, consistent layout across roles, and English UI strings throughout.",
+      "acceptanceCriteria": [
+        "App uses a consistent dashboard shell with a sidebar for navigation and a main content area.",
+        "Kepsek flows are mobile-friendly (no horizontal overflow; form controls are touch-friendly).",
+        "All visible UI strings are in English (including form labels and validation messages)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/layout/DashboardShell.tsx",
+          "operation": "create",
+          "description": "Create a consistent dashboard shell with sidebar navigation and a responsive main content region; supports role-specific nav items (Director vs Kepsek) and includes a logout control. Use shadcn-ui layout primitives (compose only). Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/layout/SidebarNav.tsx",
+          "operation": "create",
+          "description": "Create a sidebar navigation component that renders role-appropriate navigation links (e.g., Kepsek Dashboard, Director Dashboard, Principal Management) and highlights the active view; collapses appropriately on mobile."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Wrap routed pages with DashboardShell to ensure consistent layout across roles; ensure unauthorized routes render AccessDenied, and unauthenticated users see LoginGate."
+        },
+        {
+          "path": "frontend/src/utils/uiStrings.ts",
+          "operation": "create",
+          "description": "Centralize common English UI strings (common errors, empty states, buttons) to help ensure consistent English text across the app."
+        }
+      ]
+    },
+    {
+      "id": "REQ-9",
+      "summary": "Apply a consistent professional theme across dashboards and components, avoiding blue/purple as primary brand colors.",
+      "acceptanceCriteria": [
+        "Theme specifies a primary/secondary palette, typography choices, and surface/background styling and is applied across dashboards and forms.",
+        "Primary brand colors are not blue/purple.",
+        "Components (cards, tables, forms, charts) share consistent styling and spacing."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/index.css",
+          "operation": "create",
+          "description": "Create the global Tailwind/shadcn CSS variables and base styles, defining a coherent professional theme (e.g., green/teal primary, neutral surfaces, consistent radii/spacing) and applying it across the app; ensure primary brand color is not blue/purple."
+        },
+        {
+          "path": "frontend/tailwind.config.js",
+          "operation": "modify",
+          "description": "Adjust Tailwind theme tokens and chart/sidebar color variables (if needed) to align with the chosen non-blue/purple primary palette and consistent dashboard styling."
+        },
+        {
+          "path": "frontend/src/components/layout/DashboardShell.tsx",
+          "operation": "modify",
+          "description": "Apply consistent spacing, typography scale, and surface styling (cards, panels, tables) to match the global theme, ensuring visual consistency across Kepsek and Director experiences."
+        }
+      ]
+    }
+  ]
+}

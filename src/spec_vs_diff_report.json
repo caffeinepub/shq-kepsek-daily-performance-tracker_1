@@ -1,0 +1,108 @@
+{
+  "kind": "spec_vs_diff_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-15T03:48:39.030Z",
+  "summary": "Diff adds a new Motoko backend actor with authorization/storage mixins and a new role-gated TanStack Router app shell with director/kepsek dashboards, submissions UI, image upload validation, and director analytics charts. However, several requirements are either not evidenced in the diff summary or are implemented in a way that conflicts with the BuildRequest (notably: kepsek self-profile creation and director leaderboard metric).",
+  "missing_requirements": [
+    {
+      "id": "REQ-2",
+      "requirement": "Role assignment must be controlled by Director/Management (no self-selection by Kepsek).",
+      "reason": "The diff shows a non-admin flow that lets the logged-in caller save their own profile including a role field, and the UI sets role to 'kepsek' directly. This contradicts the requirement that only Director/Management assigns roles and manages kepsek profiles.",
+      "evidence": [
+        "backend/main.mo (saveCallerUserProfile(profile : UserProfile) allows caller to write profile including role)",
+        "frontend/src/components/profile/ProfileSetupDialog.tsx (mutateAsync payload includes role: 'kepsek')"
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "requirement": "Leaderboard table ranking principals by total/average daily scores (or clearly ordered by a labeled score metric).",
+      "reason": "The implemented leaderboard is explicitly 'Ranked by total number of submissions' and displays 'Total Submissions' rather than total/average score ranking.",
+      "evidence": [
+        "frontend/src/components/director/LeaderboardTable.tsx (CardDescription: 'Ranked by total number of submissions'; column 'Total Submissions'; uses school.submissionsCount)"
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "requirement": "Daily submission scoring logic: 5 categories worth 20 points each (Attendance, Class Control, Teacher Control, Parent Response, Program Execution & Problem Solving) with blanks scoring 0; backend must store/reproduce breakdown and expose query methods for dashboards.",
+      "reason": "The diff summary does not show the scoring computation, per-calendar-day uniqueness (reject/update deterministically), or the required backend query methods. The Submission type also suggests a different category model (includes both #problemSolving and #programExecution plus a single 'category' field), but the actual scoring logic and per-day constraint are not evidenced in the truncated backend snippet.",
+      "evidence": [
+        "backend/main.mo (truncated; Submission type includes score and category; no shown logic for per-day uniqueness, breakdown computation, or dashboard queries)"
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "requirement": "Backend must enforce clear attendance photo size/type limits and reject invalid/oversized images; Director and Kepsek must be able to retrieve/render stored images from canister storage.",
+      "reason": "Frontend enforces image type/size, but backend-side validation and explicit image retrieval APIs are not evidenced in the diff summary. Image rendering in detail panel uses `getDirectURL()` on the stored blob, but the backend retrieval/limits enforcement is not shown.",
+      "evidence": [
+        "frontend/src/components/uploads/AttendancePhotoUploader.tsx (client-side size/type checks)",
+        "frontend/src/components/submissions/SubmissionDetailPanel.tsx (loads image via submission.attendance.photo.getDirectURL())",
+        "backend/main.mo (truncated; includes blob-storage mixin but no shown validation/retrieval methods)"
+      ]
+    }
+  ],
+  "hallucinated_features": [
+    {
+      "description": "Kepsek self-service profile creation/edit flow (including setting their own role).",
+      "reason": "BuildRequest requires Director-controlled assignment/management of kepsek profiles and explicitly disallows self-selection of role by kepsek; the diff adds a caller-writable profile API and a UI dialog that sets role to 'kepsek'.",
+      "evidence": [
+        "backend/main.mo (saveCallerUserProfile allows caller to save UserProfile)",
+        "frontend/src/components/profile/ProfileSetupDialog.tsx (role: 'kepsek')"
+      ]
+    },
+    {
+      "description": "Leaderboard ranking by total submissions rather than score-based metrics.",
+      "reason": "BuildRequest asks for ranking by total/average daily scores; diff implements and labels ranking by submissionsCount.",
+      "evidence": [
+        "frontend/src/components/director/LeaderboardTable.tsx"
+      ]
+    },
+    {
+      "description": "Additional/expanded domain types not requested (e.g., SchoolCategory, Program/ProgramStatus, SubmissionCategory and a per-submission 'category' field).",
+      "reason": "These structures are not mentioned in the BuildRequest requirements, which focus on daily submission categories and dashboards rather than program entities and submission categorization fields.",
+      "evidence": [
+        "backend/main.mo (types: SchoolCategory, ProgramStatus, Program, SubmissionCategory, Submission.category)"
+      ]
+    }
+  ],
+  "confidence": 0.72,
+  "changed_files": [
+    "all_files_summary.json",
+    "backend/main.mo",
+    "frontend-file-summaries.txt",
+    "frontend/index.css",
+    "frontend/index.html",
+    "frontend/src/App.tsx",
+    "frontend/src/components/analytics/CompletionDonutCharts.tsx",
+    "frontend/src/components/analytics/PerformanceAnalytics.tsx",
+    "frontend/src/components/analytics/PerformanceLineChart.tsx",
+    "frontend/src/components/analytics/TimeRangeSelector.tsx",
+    "frontend/src/components/auth/AccessDenied.tsx",
+    "frontend/src/components/auth/LoginGate.tsx",
+    "frontend/src/components/director/LeaderboardTable.tsx",
+    "frontend/src/components/director/StatsCards.tsx",
+    "frontend/src/components/layout/DashboardShell.tsx",
+    "frontend/src/components/layout/SidebarNav.tsx",
+    "frontend/src/components/profile/ProfileHeader.tsx",
+    "frontend/src/components/profile/ProfileSetupDialog.tsx",
+    "frontend/src/components/submissions/DailySubmissionForm.tsx",
+    "frontend/src/components/submissions/SubmissionDetailPanel.tsx",
+    "frontend/src/components/submissions/SubmissionHistory.tsx",
+    "frontend/src/components/uploads/AttendancePhotoUploader.tsx",
+    "frontend/src/constants/regions.ts",
+    "frontend/src/constants/uploads.ts",
+    "frontend/src/hooks/useActor.ts",
+    "frontend/src/hooks/useAuthRole.ts",
+    "frontend/src/hooks/useInternetIdentity.ts",
+    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/index.css",
+    "frontend/src/main.tsx",
+    "frontend/src/pages/director/DirectorDashboardPage.tsx",
+    "frontend/src/pages/director/PrincipalDetailPage.tsx",
+    "frontend/src/pages/director/PrincipalManagementPage.tsx",
+    "frontend/src/pages/kepsek/KepsekDashboardPage.tsx",
+    "frontend/src/utils/time.ts",
+    "frontend/src/utils/urlParams.ts",
+    "frontend/tailwind.config.js",
+    "project_state.json"
+  ]
+}
